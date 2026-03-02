@@ -4,7 +4,7 @@ import { collection, query, orderBy, onSnapshot, Timestamp } from "firebase/fire
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2, Gift, Beer,
-  Wallet, MessageSquare, Crown, Calendar, Users, Lock, Eye, EyeOff
+  Wallet, Crown, Lock, Eye, EyeOff, UserCheck, XCircle
 } from "lucide-react";
 
 // --- INTERFACES ---
@@ -37,7 +37,6 @@ const Dashboard = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    // On ne lance la récupération des données QUE si l'utilisateur est authentifié
     if (!isAuthenticated) return;
 
     const q = query(collection(db, "responses"), orderBy("createdAt", "desc"));
@@ -48,13 +47,16 @@ const Dashboard = () => {
       })) as ResponseData[];
       setResponses(data);
       setLoading(false);
+    }, (err) => {
+      console.error("Erreur Firebase:", err);
+      setLoading(false);
     });
     return () => unsubscribe();
   }, [isAuthenticated]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "Maman50") { // <--- TON MOT DE PASSE ICI
+    if (password.toLowerCase() === "maman50") { // Acceptation minuscule/majuscule
       setIsAuthenticated(true);
       setError(false);
     } else {
@@ -64,7 +66,7 @@ const Dashboard = () => {
   };
 
   // --- CALCULS DES STATS ---
-  const totalInvites = responses.filter(r => r.attending === "Oui").reduce((acc, r) => acc + 1 + r.guests, 0);
+  const totalInvites = responses.filter(r => r.attending === "Oui").reduce((acc, r) => acc + 1 + Number(r.guests || 0), 0);
   const totalOui = responses.filter(r => r.attending === "Oui").length;
   const totalBouteilles = responses.filter(r => r.contribution === "Bouteille").length;
   const totalCagnotte = responses.filter(r => r.contribution.includes("Cagnotte")).length;
@@ -73,23 +75,24 @@ const Dashboard = () => {
   // --- ÉCRAN DE CONNEXION ---
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-6 font-sans">
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center p-4 font-sans">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white border border-[#D4AF37]/20 p-8 md:p-12 rounded-[2.5rem] shadow-2xl max-w-md w-full text-center relative overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white border border-gold/20 p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center relative"
         >
-          <div className="absolute top-0 left-0 w-full h-2 bg-gold" />
-          <Crown className="w-16 h-16 text-[#D4AF37] mx-auto mb-6" />
-          <h2 className="font-serif text-3xl text-[#1a1a1a] mb-2 italic">Accès Réservé</h2>
-          <p className="text-gray-400 text-xs uppercase tracking-widest mb-8">Espace Administrateur</p>
+          <div className="w-16 h-16 bg-gold/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8 text-gold" />
+          </div>
+          <h2 className="font-serif text-2xl text-[#1a1a1a] mb-2 italic">Accès Privé</h2>
+          <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-8 font-bold">Administration Sylvie 50</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Entrez le code secret"
-                className={`w-full p-4 bg-[#FAF7F2] border ${error ? 'border-red-500' : 'border-[#D4AF37]/20'} rounded-xl outline-none focus:ring-2 focus:ring-[#D4AF37]/50 transition-all text-center font-bold tracking-widest`}
+                placeholder="Mot de passe"
+                className={`w-full p-4 bg-gray-50 border ${error ? 'border-red-500' : 'border-gold/20'} rounded-xl outline-none focus:ring-2 focus:ring-gold/30 transition-all text-center font-bold`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -102,151 +105,109 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <motion.button
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
-              className="w-full bg-[#1a1a1a] text-white py-4 rounded-xl font-bold hover:bg-[#D4AF37] transition-all flex items-center justify-center gap-2 group"
+              className="w-full bg-[#1a1a1a] text-white py-4 rounded-xl font-bold active:scale-95 transition-transform flex items-center justify-center gap-2"
             >
-              Déverrouiller le Journal
-              <Lock className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-            </motion.button>
+              Se connecter
+            </button>
           </form>
-
-          {error && <p className="text-red-500 text-xs mt-4 font-bold uppercase tracking-tighter">Code incorrect</p>}
+          {error && <p className="text-red-500 text-xs mt-4 font-bold uppercase tracking-tighter italic">Accès refusé</p>}
         </motion.div>
       </div>
     );
   }
 
-  // --- ÉCRAN DE CHARGEMENT APRÈS CONNEXION ---
-  if (loading) return (
-    <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center">
-      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2 }}>
-        <Crown className="w-12 h-12 text-[#D4AF37]" />
-      </motion.div>
-    </div>
-  );
-
-  // --- RENDU DU DASHBOARD ---
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-[#2D2D2D] font-sans pb-10 md:pb-20">
-      {/* HEADER ADAPTATIF */}
-      <div className="bg-white border-b border-[#D4AF37]/20 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-10 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start gap-2 mb-1">
-              <Crown className="w-5 h-5 text-[#D4AF37]" />
-              <span className="text-[#D4AF37] uppercase tracking-[0.2em] text-[9px] font-bold">Espace Royal</span>
-            </div>
-            <h1 className="font-serif text-3xl md:text-5xl text-[#1a1a1a] italic leading-tight">Le Livre d'Or de Sylvie</h1>
+    <div className="min-h-screen bg-[#FDFBF7] text-[#2D2D2D] font-sans">
+      {/* HEADER */}
+      <div className="bg-white border-b border-gold/10 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
+          <div>
+            <h1 className="font-serif text-xl md:text-3xl italic">Le Livre d'Or</h1>
+            <p className="text-[9px] uppercase tracking-widest text-gold font-bold">50 Ans de Grâce</p>
           </div>
-
-          <div className="flex bg-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-2xl divide-x divide-[#D4AF37]/20 overflow-hidden">
-             <div className="px-5 py-3 md:px-8 md:py-4 text-center">
-                <p className="text-2xl md:text-3xl font-serif text-[#D4AF37]">{totalInvites}</p>
-                <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-[#8B7355] font-bold">Invités</p>
-             </div>
-             <div className="px-5 py-3 md:px-8 md:py-4 text-center">
-                <p className="text-2xl md:text-3xl font-serif text-[#D4AF37]">{responses.length}</p>
-                <p className="text-[8px] md:text-[10px] uppercase tracking-widest text-[#8B7355] font-bold">Réponses</p>
-             </div>
+          <div className="flex gap-2">
+            <div className="bg-gold/5 px-4 py-2 rounded-xl border border-gold/20 text-center">
+               <span className="block text-xl font-serif text-gold leading-none">{totalInvites}</span>
+               <span className="text-[8px] uppercase font-bold text-gray-400">Total Humains</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 md:mt-12">
-        {/* GRILLE DE STATS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
-          <StatCard icon={<CheckCircle2 className="w-5 h-5 text-emerald-600"/>} label="Confirmés" value={totalOui} subtext="Présences validées" isPrimary />
-          <StatCard icon={<Beer className="w-5 h-5 text-blue-600"/>} label="Bouteilles" value={totalBouteilles} subtext="Vin & Champagne" />
-          <StatCard icon={<Wallet className="w-5 h-5 text-[#D4AF37]"/>} label="Cagnottes" value={totalCagnotte} subtext="Mobile & Enveloppes" />
-          <StatCard icon={<Gift className="w-5 h-5 text-purple-600"/>} label="Cadeaux" value={totalCadeaux} subtext="Surprises prévues" />
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* STATS */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <StatCard icon={<UserCheck className="w-4 h-4"/>} label="Présents" value={totalOui} subtext="Confirmés" isPrimary />
+          <StatCard icon={<Beer className="w-4 h-4 text-blue-500"/>} label="Boissons" value={totalBouteilles} subtext="Ndolé & Vins" />
+          <StatCard icon={<Wallet className="w-4 h-4 text-gold"/>} label="Cagnotte" value={totalCagnotte} subtext="OM/MoMo" />
+          <StatCard icon={<Gift className="w-4 h-4 text-purple-500"/>} label="Cadeaux" value={totalCadeaux} subtext="Surprises" />
         </div>
 
-        {/* LISTE DES RÉPONSES */}
-        <div className="bg-white border border-[#D4AF37]/20 rounded-[1.5rem] md:rounded-[2.5rem] shadow-xl overflow-hidden mb-10">
-          <div className="p-6 md:p-8 bg-[#FAF7F2] border-b border-[#D4AF37]/10 flex justify-between items-center">
-            <h2 className="font-serif text-xl md:text-2xl text-[#1a1a1a]">Journal des Présences</h2>
-          </div>
+        {/* LISTE */}
+        <div className="space-y-4">
+          <h2 className="font-serif text-lg italic mb-4">Détails des réponses</h2>
+          <AnimatePresence>
+            {responses.map((res) => (
+              <motion.div
+                layout
+                key={res.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white border border-gold/10 rounded-2xl p-4 md:p-6 shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center"
+              >
+                {/* Avatar */}
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-lg shrink-0 ${
+                  res.attending === "Oui" ? "bg-gold/10 text-gold border border-gold/20" : "bg-gray-100 text-gray-400"
+                }`}>
+                  {res.name.charAt(0)}
+                </div>
 
-          <div className="divide-y divide-[#F0E6D2]">
-            {responses.length === 0 ? (
-                <div className="p-20 text-center text-gray-300 italic">En attente des premières réponses...</div>
-            ) : (
-              responses.map((res) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  key={res.id}
-                  className="p-6 md:p-8 flex flex-col md:flex-row gap-4 md:gap-8 items-center md:items-start hover:bg-[#FDFBF7] transition-colors group"
-                >
-                  <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center text-xl md:text-2xl font-serif border-2 flex-shrink-0 ${
-                    res.attending === "Oui" ? "border-[#D4AF37] text-[#D4AF37] bg-[#D4AF37]/5" : "border-gray-200 text-gray-300 bg-gray-50"
-                  }`}>
-                    {res.name.charAt(0)}
+                {/* Infos */}
+                <div className="flex-grow">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="font-serif text-lg">{res.name}</h3>
+                    {res.attending === "Oui" ?
+                      <span className="text-[9px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100 font-bold uppercase tracking-tighter">+{res.guests} Invité(s)</span>
+                      : <span className="text-[9px] bg-red-50 text-red-400 px-2 py-0.5 rounded-full border border-red-100 font-bold uppercase tracking-tighter">Absent</span>
+                    }
                   </div>
 
-                  <div className="flex-grow text-center md:text-left w-full">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-3">
-                      <h3 className="text-xl md:text-2xl font-serif text-[#1a1a1a]">{res.name}</h3>
-                      <div className="flex justify-center md:justify-start">
-                        <span className={`px-4 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-sm ${
-                          res.attending === "Oui" ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-400 border border-red-100"
-                        }`}>
-                          {res.attending === "Oui" ? `Confirmé (+${res.guests})` : "Absent"}
-                        </span>
-                      </div>
+                  {res.message && (
+                    <p className="text-gray-500 text-sm italic mb-2 leading-snug">"{res.message}"</p>
+                  )}
+
+                  {res.attending === "Oui" && (
+                    <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
+                       <span className="bg-gray-50 px-2 py-1 rounded-md border border-gray-100">Apporte : <b className="text-gray-700">{res.contribution}</b></span>
                     </div>
+                  )}
+                </div>
 
-                    {res.message && (
-                      <div className="relative mb-4 bg-[#FAF7F2] p-4 rounded-xl md:rounded-2xl italic text-gray-600 text-sm border-l-4 border-[#D4AF37]/30 mx-auto md:mx-0 max-w-[500px]">
-                        "{res.message}"
-                      </div>
-                    )}
-
-                    {res.attending === "Oui" && (
-                      <div className="inline-flex items-center gap-2 bg-[#D4AF37]/5 px-3 py-1.5 rounded-lg border border-[#D4AF37]/10 text-[#8B7355] text-[11px] font-medium">
-                        {getContributionIcon(res.contribution)}
-                        <span>Prévu : <b className="text-[#1a1a1a]">{res.contribution}</b></span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="hidden sm:block text-[9px] uppercase tracking-widest text-gray-400 font-bold self-start mt-2">
-                     {res.createdAt ? res.createdAt.toDate().toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) : '--'}
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
+                {/* Date */}
+                <div className="text-[9px] text-gray-300 font-bold uppercase tracking-widest md:text-right">
+                  {res.createdAt ? res.createdAt.toDate().toLocaleDateString('fr-FR') : '--'}
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </main>
     </div>
   );
 };
 
-// --- SOUS-COMPOSANTS ---
 function StatCard({ icon, label, value, subtext, isPrimary }: StatCardProps) {
   return (
-    <div className={`p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border bg-white shadow-sm transition-all hover:shadow-md ${
-        isPrimary ? "border-[#D4AF37] ring-1 ring-[#D4AF37]/20" : "border-[#D4AF37]/10"
-      }`}
-    >
-      <div className="bg-[#FAF7F2] w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-4 md:mb-6">
+    <div className={`p-4 md:p-6 rounded-2xl border bg-white shadow-sm flex flex-col items-center text-center ${isPrimary ? "border-gold" : "border-gold/10"}`}>
+      <div className="w-8 h-8 md:w-10 md:h-10 bg-gold/5 rounded-lg flex items-center justify-center mb-3">
         {icon}
       </div>
-      <p className="text-3xl md:text-4xl font-serif text-[#1a1a1a] mb-1">{value}</p>
-      <p className="text-[10px] md:text-xs font-bold text-[#D4AF37] uppercase tracking-widest mb-1 md:mb-2">{label}</p>
-      <p className="text-[9px] md:text-[10px] text-gray-400 leading-relaxed uppercase">{subtext}</p>
+      <p className="text-xl md:text-3xl font-serif text-[#1a1a1a]">{value}</p>
+      <p className="text-[9px] font-bold text-gold uppercase tracking-widest">{label}</p>
     </div>
   );
-}
-
-function getContributionIcon(type: string) {
-  if (type === "Bouteille") return <Beer className="w-3 h-3 text-blue-500" />;
-  if (type.includes("Cagnotte")) return <Wallet className="w-3 h-3 text-[#D4AF37]" />;
-  return <Gift className="w-3 h-3 text-purple-500" />;
 }
 
 export default Dashboard;
