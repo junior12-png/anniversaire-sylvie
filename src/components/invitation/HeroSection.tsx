@@ -1,121 +1,202 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, Variants } from "framer-motion";
 import { useRef } from "react";
 import heroFloral from "@/assets/hero-floral.jpg";
 
-const HeroSection = () => {
-  const containerRef = useRef(null);
+const slogan = "Une Vie de Lumière";
+const title = "Cinquante ans de";
+const subtitle = "Grâce & Majesté";
+const name = "Maman Sylvie";
 
-  // Parallaxe optimisé : On réduit l'amplitude sur mobile pour la performance
+// --- ANIMATIONS ---
+
+const letterVariants: Variants = {
+  hidden: { opacity: 0, y: 5 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.2, ease: "easeOut" }
+  }
+};
+
+const yoyoTransition = {
+  duration: 2,
+  repeat: Infinity,
+  repeatType: "mirror",
+  ease: "easeInOut"
+} as const;
+
+// Transition pour l'effet de lumière qui traverse (plus rapide pour être visible)
+const shimmerTransition = {
+  duration: 3,
+  repeat: Infinity,
+  ease: "linear",
+  repeatDelay: 0.5
+} as const;
+
+// --- COMPOSANT D'ÉCRITURE ---
+const WritingText = ({
+  text,
+  className,
+  stagger = 0.05,
+  startDelay = 0
+}: {
+  text: string,
+  className?: string,
+  stagger?: number,
+  startDelay?: number
+}) => (
+  <motion.span
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: false, amount: 0.3 }}
+    variants={{
+      visible: {
+        transition: {
+          staggerChildren: stagger,
+          delayChildren: startDelay,
+        }
+      }
+    }}
+    className={className}
+  >
+    {text.split("").map((char, index) => (
+      <motion.span key={index} variants={letterVariants} className="inline-block">
+        {char === " " ? "\u00A0" : char}
+      </motion.span>
+    ))}
+  </motion.span>
+);
+
+const HeroSection = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
 
-  const yImage = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
-  const opacityText = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const yImage = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const opacityContent = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
   return (
-    <section ref={containerRef} className="relative h-[100svh] w-full overflow-hidden bg-[#050505]">
-
-      {/* --- ARRIÈRE-PLAN --- */}
+    <section
+      ref={containerRef}
+      className="relative flex min-h-[100svh] w-full flex-col items-center overflow-hidden bg-[#050505] px-4 py-6 md:py-16"
+    >
+      {/* FOND IMAGE */}
       <motion.div style={{ y: yImage }} className="absolute inset-0 z-0">
         <img
           src={heroFloral}
-          alt="Maman Sylvie"
-          className="h-full w-full object-cover scale-110 object-[center_20%]" // Ajusté pour ne pas couper le visage
+          alt="Décor"
+          className="h-full w-full object-cover scale-110 object-center"
         />
-        {/* Voile sombre progressif pour la lisibilité */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#050505]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/40 to-[#050505]" />
       </motion.div>
 
-      {/* --- CONTENU --- */}
-      <motion.div
-        style={{ opacity: opacityText }}
-        className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center"
-      >
-        {/* Barre lumineuse */}
+      {/* 1. TOP ORNAMENT */}
+      <div className="relative z-10 pt-2 pb-2 md:pb-12">
         <motion.div
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: "60px", opacity: 1 }}
-          transition={{ duration: 1.2, ease: "circOut" }}
-          className="mb-6 h-[1.5px] bg-gold"
+          initial={{ scaleX: 0, opacity: 0 }}
+          whileInView={{ scaleX: 1, opacity: 1 }}
+          viewport={{ once: false }}
+          transition={{ duration: 1.5 }}
+          className="h-[1px] w-12 bg-yellow-500/30 md:w-24"
         />
+      </div>
 
-        {/* Slogan */}
-        <div className="mb-3 overflow-hidden">
-          <motion.span
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="block font-sans text-[9px] md:text-[11px] tracking-[0.4em] uppercase text-gold/90"
-          >
-            Une Vie de Lumière
-          </motion.span>
+      {/* 2. CENTRE : CONTENU PRINCIPAL */}
+      <motion.div
+        style={{ opacity: opacityContent }}
+        className="relative z-10 flex w-full flex-grow flex-col items-center justify-center gap-4 sm:gap-10 text-center"
+      >
+        <div className="flex flex-col items-center">
+          <WritingText
+            text={slogan}
+            stagger={0.06}
+            className="mb-2 font-sans text-[10px] tracking-[0.4em] text-[#c6a243] sm:text-xs uppercase"
+          />
+
+          <h1 className="font-serif text-[1.9rem] leading-[1.2] text-white sm:text-5xl md:text-7xl max-w-[95vw]">
+            <WritingText text={title} className="font-light block" startDelay={0.8} />
+
+            <motion.span
+              animate={{ backgroundPosition: ["-200% 0%", "200% 0%"] }}
+              transition={shimmerTransition}
+              className="italic font-medium bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#bf953f] bg-clip-text text-transparent block pb-2"
+              style={{ backgroundSize: "200% auto" }}
+            >
+              <WritingText text={subtitle} startDelay={1.8} />
+            </motion.span>
+          </h1>
         </div>
 
-        {/* Titre Principal */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 0.3 }}
-          className="font-serif text-[2.5rem] md:text-7xl text-white leading-[1.1] mb-4"
-        >
-          <span className="font-light">Cinquante ans de</span>
-          <br />
-          <span className="italic font-medium text-gold drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]">
-            Grâce & Majesté
-          </span>
-        </motion.h1>
-
-        {/* NOM avec lueur */}
-        <div className="relative mt-4">
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 0.3 }}
-            transition={{ duration: 2, delay: 0.8 }}
-            className="absolute left-1/2 top-1/2 -z-10 h-24 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/30 blur-[60px]"
+        <div className="relative mt-2 sm:mt-6">
+          <WritingText
+            text={name}
+            stagger={0.08}
+            startDelay={2.8}
+            className="font-script text-6xl text-[#d4af37] drop-shadow-2xl sm:text-8xl md:text-9xl"
           />
+        </div>
+      </motion.div>
+
+      {/* 3. BAS : DATE & DÉCOUVRIR */}
+      <div className="relative z-10 flex flex-col items-center gap-6 pt-4 pb-6 md:gap-10">
+
+        {/* DATE AVEC EFFET DE LUMIÈRE RÉEL (SHIMMER) */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false }}
+          transition={{ delay: 3.8, duration: 1.2 }}
+          className="flex items-center gap-3 sm:gap-6"
+        >
+          <div className="h-[1px] w-6 bg-yellow-500/20 sm:w-12" />
 
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.5, delay: 1 }}
-            className="font-script text-6xl md:text-9xl text-gold"
+            animate={{ backgroundPosition: ["200% 0%", "-200% 0%"] }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "linear",
+              repeatDelay: 1
+            }}
+            className="font-sans text-[10px] tracking-[0.3em] uppercase sm:text-xs bg-gradient-to-r from-white/20 via-white to-white/20 bg-clip-text text-transparent"
+            style={{
+              backgroundSize: "250% auto",
+              display: "inline-block"
+            }}
           >
-            Maman Sylvie
+            19 avril 2026 <span className="mx-1 text-yellow-500/40">•</span> Douala
           </motion.p>
-        </div>
 
-        {/* Détails date/lieu */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
-          className="mt-10 flex items-center gap-3 text-white/80"
-        >
-          <div className="h-[1px] w-6 md:w-10 bg-gold/40" />
-          <p className="font-sans text-[10px] md:text-xs tracking-[0.2em] uppercase">
-            12 avril 2026 • Douala
-          </p>
-          <div className="h-[1px] w-6 md:w-10 bg-gold/40" />
+          <div className="h-[1px] w-6 bg-yellow-500/20 sm:w-12" />
         </motion.div>
 
-        {/* Scroll Indicator */}
+        {/* INDICATEUR DÉCOUVRIR */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: false }}
+          transition={{ delay: 4.5 }}
+          className="flex flex-col items-center gap-2"
         >
-          <span className="text-[8px] uppercase tracking-[0.3em] text-gold/50">Découvrir</span>
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-[1px] h-8 bg-gradient-to-b from-gold to-transparent"
-          />
-        </motion.div>
+          <motion.span
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={yoyoTransition}
+            className="text-[8px] uppercase tracking-[0.4em] text-yellow-500/40 sm:text-[9px]"
+          >
+            Découvrir
+          </motion.span>
 
-      </motion.div>
+          <div className="relative h-10 w-[1px] overflow-hidden bg-white/10 sm:h-14">
+            <motion.div
+              animate={{ y: [-40, 40] }}
+              transition={yoyoTransition}
+              className="absolute h-full w-full bg-gradient-to-b from-transparent via-yellow-500/60 to-transparent"
+            />
+          </div>
+        </motion.div>
+      </div>
     </section>
   );
 };
