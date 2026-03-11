@@ -1,6 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Chopin+Script&family=Noelan&family=Montserrat:wght@300&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Pour Sunny Winter, Kingthings Christmas, Christmas Cards :
+   Il faut les héberger dans /public/fonts et utiliser @font-face */
+
+.font-chopin { font-family: 'Chopin Script', cursive; }
+.font-noelan { font-family: 'Noelan', cursive; }
+.font-sunny { font-family: 'Sunny Winter', cursive; }
+.font-king { font-family: 'Kingthings Christmas', cursive; }
+.font-cards { font-family: 'Christmas Cards', cursive; }
 
 @layer base {
   :root {

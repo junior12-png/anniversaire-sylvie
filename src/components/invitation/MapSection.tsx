@@ -1,112 +1,179 @@
+/**
+ * MapSection.tsx — Informations lieu (sans carte, sans bouton itinéraire)
+ * ✅ Bouton "Voir l'itinéraire" retiré
+ * ✅ Responsive SE → écran géant
+ */
+
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { MapPin, Navigation } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 
 const MapSection = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const isInView = useInView(ref, { once: false, amount: 0.2 });
 
-  // LIEN GPS : Google Maps direct
-  const mapSearchUrl = "https://www.google.com/maps/search/?api=1&query=Ndogpassi+III+Douala";
-
-  // IFRAME : Zone de Ndogpassi (Utilise une URL embed réelle si possible)
-  const iframeSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.943!2d9.78!3d4.02!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnMTIuMCJOIDnCsDQ2JzQ4LjAiRQ!5e0!3m2!1sfr!2scm!4v1620000000000";
+  const details = [
+    { label: "Lieu de la fête", value: "Ndogpassi III", highlight: true },
+    { label: "Repère",          value: "Entrée Lycée",  highlight: false },
+    { label: "Ville",           value: "Douala",         highlight: false },
+    { label: "Pays",            value: "Cameroun",       highlight: false },
+  ];
 
   return (
-    <section ref={ref} className="py-20 bg-[#080808] relative overflow-hidden">
-      <div className="container max-w-6xl mx-auto px-6">
+    <section ref={ref} style={{
+      padding: "clamp(3rem, 8vw, 6rem) 0",
+      background: "#080808",
+      overflow: "hidden",
+    }}>
+      <div style={{ maxWidth: "clamp(300px, 90vw, 740px)", margin: "0 auto", padding: "0 clamp(0.75rem, 4vw, 3rem)" }}>
 
-        {/* En-tête de section */}
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12 md:mb-16"
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.9 }}
+          style={{ textAlign: "center", marginBottom: "clamp(2rem, 5vw, 4rem)" }}
         >
-          <div className="inline-flex p-3 rounded-full bg-gold/10 mb-4 md:mb-6">
-            <MapPin className="text-gold w-5 h-5 md:w-6 md:h-6 animate-bounce" />
+          <div style={{
+            display: "inline-flex", width: "clamp(44px, 8vw, 60px)", height: "clamp(44px, 8vw, 60px)", borderRadius: "50%",
+            background: "rgba(212,175,55,0.08)", border: "1px solid rgba(212,175,55,0.2)",
+            alignItems: "center", justifyContent: "center", marginBottom: 16,
+          }}>
+            <MapPin size={22} style={{ color: "#d4af37" }} />
           </div>
-          <p className="font-sans text-[9px] md:text-[10px] tracking-[0.4em] uppercase text-gold/60 mb-2">
-            Localisation
-          </p>
-          <h2 className="font-serif text-3xl md:text-5xl text-white font-light leading-tight">
-            Rendez-vous à <span className="italic text-gold">Ndogpassi</span>
-          </h2>
+
+          <p style={{
+            fontFamily: "sans-serif", fontSize: "clamp(0.45rem, 1.3vw, 0.65rem)",
+            letterSpacing: "0.4em", textTransform: "uppercase",
+            color: "rgba(212,175,55,0.55)", marginBottom: 10,
+          }}>Localisation</p>
+
+          <h2 style={{
+            fontFamily: "'Cinzel Decorative', serif",
+            fontSize: "clamp(1rem, 3.5vw, 2.2rem)",
+            color: "transparent",
+            background: "linear-gradient(135deg, #bf953f, #fcf6ba, #b38728)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            letterSpacing: "0.06em",
+          }}>Rendez-vous à Ndogpassi</h2>
+
+          <div style={{ height: 1, width: 50, background: "linear-gradient(90deg, transparent, #d4af37, transparent)", margin: "14px auto 0" }} />
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 items-start">
-
-          {/* INFOS ADRESSE - Toujours en haut sur mobile */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ delay: 0.3 }}
-            className="lg:col-span-1 space-y-6 md:space-y-8 order-2 lg:order-1"
-          >
-            <div className="border-l-2 border-gold/30 pl-5">
-              <h3 className="text-white font-serif text-xl md:text-2xl mb-3">Lieu de la fête</h3>
-              <p className="text-white/60 font-sans text-sm leading-relaxed">
-                <strong className="text-gold font-medium">Ndogpassi III</strong><br />
-                Zone de Recasements<br />
-                Près de l'École Publique<br />
-                <span className="text-white/40 italic">Douala, Cameroun</span>
-              </p>
-            </div>
-
-            <div className="pt-2">
-              <a
-                href={mapSearchUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-3 bg-gold text-black w-full sm:w-auto px-8 py-4 rounded-full font-sans text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-all duration-300 shadow-[0_10px_30px_rgba(212,175,55,0.2)] active:scale-95"
-              >
-                <Navigation className="w-4 h-4" />
-                Ouvrir l'itinéraire
-              </a>
-            </div>
-          </motion.div>
-
-          {/* LA CARTE - Responsive height */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="lg:col-span-2 relative group order-1 lg:order-2"
-          >
-            {/* Effet de lueur derrière la carte */}
-            <div className="absolute -inset-1 bg-gold/20 rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition duration-700"></div>
-
-            <div className="relative rounded-2xl overflow-hidden border border-white/10 h-[300px] md:h-[450px] shadow-2xl">
-              <iframe
-                src={iframeSrc}
-                width="100%"
-                height="100%"
-                style={{
-                  border: 0,
-                  filter: "grayscale(1) invert(92%) contrast(85%) brightness(95%)"
-                }}
-                allowFullScreen
-                loading="lazy"
-                title="Localisation Ndogpassi"
-              />
-              {/* Overlay pour empêcher le scroll accidentel sur mobile */}
-              <div className="absolute inset-0 pointer-events-none ring-1 ring-inset ring-white/10 rounded-2xl"></div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Message final citation */}
+        {/* Venue card */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: 1 }}
-          className="mt-12 md:mt-16 p-6 md:p-8 border border-white/5 rounded-2xl bg-white/[0.01] text-center"
+          initial={{ opacity: 0, y: 30, scale: 0.96 }}
+          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.96 }}
+          transition={{ duration: 0.95, delay: 0.15 }}
+          style={{
+            position: "relative",
+            background: "linear-gradient(145deg, #1c1504, #0f0b02, #1a1200)",
+            border: "1px solid rgba(212,175,55,0.25)",
+            borderRadius: 26,
+            padding: "clamp(1.8rem, 5vw, 3.5rem) clamp(1.4rem, 4vw, 3rem)",
+            overflow: "hidden",
+            textAlign: "center",
+          }}
         >
-          <p className="font-serif italic text-white/40 text-sm md:text-base max-w-lg mx-auto leading-relaxed">
-            "La route du bonheur passe par Ndogpassi ce jour-là."
-          </p>
+          {/* Corner ornaments */}
+          {[
+            { top: 14, left: 14, borderWidth: "1px 0 0 1px" },
+            { top: 14, right: 14, borderWidth: "1px 1px 0 0" },
+            { bottom: 14, left: 14, borderWidth: "0 0 1px 1px" },
+            { bottom: 14, right: 14, borderWidth: "0 1px 1px 0" },
+          ].map((pos, i) => (
+            <div key={i} style={{
+              position: "absolute", width: 18, height: 18,
+              borderStyle: "solid", borderColor: "rgba(212,175,55,0.3)",
+              borderWidth: pos.borderWidth, ...pos,
+            }} />
+          ))}
+
+          {/* Shimmer */}
+          <motion.div
+            animate={{ x: ["-120%", "180%"] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+            style={{
+              position: "absolute", top: 0, left: 0, width: "50%", height: "100%",
+              background: "linear-gradient(90deg, transparent, rgba(255,245,200,0.04), transparent)",
+              transform: "skewX(-12deg)", pointerEvents: "none",
+            }}
+          />
+
+          {/* Gold top bar */}
+          <div style={{
+            position: "absolute", top: 0, left: "20%", right: "20%", height: 1,
+            background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.7), transparent)",
+          }} />
+
+          {/* Star */}
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
+            style={{ marginBottom: 20 }}
+          >
+            <Star size={20} style={{ color: "rgba(212,175,55,0.4)", margin: "0 auto" }} fill="rgba(212,175,55,0.1)" />
+          </motion.div>
+
+          {/* Details list */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "clamp(1rem, 3vw, 1.8rem)", position: "relative", zIndex: 1 }}>
+            {details.map((d, i) => (
+              <motion.div
+                key={d.label}
+                initial={{ opacity: 0, x: -20 }}
+                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                transition={{ delay: 0.3 + i * 0.1, duration: 0.7 }}
+              >
+                <p style={{
+                  fontFamily: "sans-serif",
+                  fontSize: "clamp(0.45rem, 1.2vw, 0.6rem)",
+                  letterSpacing: "0.35em",
+                  textTransform: "uppercase",
+                  color: "rgba(212,175,55,0.45)",
+                  marginBottom: 4,
+                }}>{d.label}</p>
+                <p style={{
+                  fontFamily: "'Cinzel Decorative', serif",
+                  fontSize: d.highlight
+                    ? "clamp(1.2rem, 4vw, 2.4rem)"
+                    : "clamp(0.85rem, 2.5vw, 1.5rem)",
+                  color: d.highlight ? "#f0d98a" : "rgba(255,255,255,0.7)",
+                  letterSpacing: d.highlight ? "0.06em" : "0.04em",
+                  textShadow: d.highlight ? "0 0 20px rgba(212,175,55,0.3)" : "none",
+                }}>{d.value}</p>
+
+                {i < details.length - 1 && (
+                  <div style={{
+                    height: 1, marginTop: 14,
+                    background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.15), transparent)",
+                  }} />
+                )}
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
+
+        {/* Quote */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          style={{
+            textAlign: "center",
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "clamp(0.8rem, 2vw, 1rem)",
+            fontStyle: "italic",
+            color: "rgba(255,255,255,0.25)",
+            marginTop: "clamp(1.5rem, 3vw, 2.5rem)",
+          }}
+        >
+          "La route du bonheur passe par Ndogpassi ce jour-là."
+        </motion.p>
       </div>
+
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@1,400&display=swap');`}</style>
     </section>
   );
 };
