@@ -1,10 +1,8 @@
 /**
  * RSVPForm.tsx — Formulaire RSVP revu et épuré
- *
- * Changements :
- *  - Style luxe doré cohérent avec le reste
- *  - Suppression du MTN MoMo (Orange Money uniquement)
- *  - Suppression du champ accompagnants
+ * ✅ Popup cadeau/contribution corrigé (suppression du bouton "Sélectionner Orange Money" dupliqué)
+ * ✅ Police augmentée sur mobile
+ * ✅ Responsive SE → écran géant
  */
 
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -13,12 +11,14 @@ import { Check, Heart, Loader2, Wand2, X, Copy, Frown, Smartphone } from "lucide
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-/* ── FONT ─────────────────────────────────────────────────────────── */
 const FontStyle = () => (
-  <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@1,300;1,400;1,600&display=swap');`}</style>
+  <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@1,300;1,400;1,600&display=swap');
+  .rsvp-shimmer { animation: rsvpShimmer 4s linear infinite; }
+  .rsvp-shimmer-slow { animation: rsvpShimmer 6s linear infinite; }
+  @keyframes rsvpShimmer { from { transform: translateX(-200%); } to { transform: translateX(400%); } }
+  `}</style>
 );
 
-/* ── GOLD INPUT ───────────────────────────────────────────────────── */
 const GoldInput = ({
   placeholder, value, onChange, type = "text", required = false,
 }: {
@@ -27,20 +27,18 @@ const GoldInput = ({
   type?: string; required?: boolean;
 }) => (
   <input
-    type={type}
-    required={required}
-    value={value}
+    type={type} required={required} value={value}
     onChange={(e) => onChange(e.target.value)}
     placeholder={placeholder}
     style={{
       width: "100%", boxSizing: "border-box",
       background: "rgba(212,175,55,0.04)",
       border: "1px solid rgba(212,175,55,0.18)",
-      borderRadius: 16, padding: "clamp(0.85rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.4rem)",
+      borderRadius: 16, padding: "clamp(0.9rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.4rem)",
       color: "white", outline: "none",
       fontFamily: "'Cormorant Garamond', serif",
       fontStyle: "italic",
-      fontSize: "clamp(0.9rem, 2vw, 1.05rem)",
+      fontSize: "clamp(1.05rem, 2.5vw, 1.1rem)",
       letterSpacing: "0.03em",
       transition: "border-color 0.3s",
     }}
@@ -57,19 +55,18 @@ const GoldTextarea = ({
   rows?: number;
 }) => (
   <textarea
-    rows={rows}
-    value={value}
+    rows={rows} value={value}
     onChange={(e) => onChange(e.target.value)}
     placeholder={placeholder}
     style={{
       width: "100%", boxSizing: "border-box",
       background: "rgba(212,175,55,0.04)",
       border: "1px solid rgba(212,175,55,0.18)",
-      borderRadius: 16, padding: "clamp(0.85rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.4rem)",
+      borderRadius: 16, padding: "clamp(0.9rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.4rem)",
       color: "white", outline: "none", resize: "none",
       fontFamily: "'Cormorant Garamond', serif",
       fontStyle: "italic",
-      fontSize: "clamp(0.88rem, 2vw, 1rem)",
+      fontSize: "clamp(1.05rem, 2.5vw, 1.05rem)",
       letterSpacing: "0.03em",
       transition: "border-color 0.3s",
     }}
@@ -78,11 +75,10 @@ const GoldTextarea = ({
   />
 );
 
-/* ── LABEL ────────────────────────────────────────────────────────── */
 const FieldLabel = ({ children }: { children: React.ReactNode }) => (
   <p style={{
     fontFamily: "sans-serif",
-    fontSize: "clamp(0.5rem, 1.2vw, 0.6rem)",
+    fontSize: "clamp(0.82rem, 1.8vw, 0.78rem)",
     letterSpacing: "0.35em",
     textTransform: "uppercase",
     color: "rgba(212,175,55,0.55)",
@@ -90,7 +86,7 @@ const FieldLabel = ({ children }: { children: React.ReactNode }) => (
   }}>{children}</p>
 );
 
-/* ── PAYMENT MODAL (Orange Money only) ───────────────────────────── */
+/* ── PAYMENT MODAL — Orange Money uniquement, sans bouton dupliqué ── */
 const PaymentModal = ({ onSelect, onClose }: {
   onSelect: (v: string) => void;
   onClose: () => void;
@@ -112,110 +108,52 @@ const PaymentModal = ({ onSelect, onClose }: {
       <motion.div
         initial={{ scale: 0.88, y: 50 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.88, y: 50 }}
         transition={{ type: "spring", stiffness: 120, damping: 18 }}
-        style={{
-          position: "relative", maxWidth: 380, width: "100%",
-          background: "linear-gradient(145deg, #1c1504, #0f0b02, #1a1200)",
-          border: "1px solid rgba(212,175,55,0.3)",
-          borderRadius: 28,
-          padding: "clamp(1.8rem, 5vw, 2.6rem)",
-          overflow: "hidden",
-        }}
+        style={{ position: "relative", maxWidth: 380, width: "100%", background: "linear-gradient(145deg, #1c1504, #0f0b02, #1a1200)", border: "1px solid rgba(212,175,55,0.3)", borderRadius: 28, padding: "clamp(1.5rem, 5vw, 2.6rem)", overflow: "auto", maxHeight: "90dvh" }}
       >
-        {/* Shimmer */}
-        <motion.div
-          animate={{ x: ["-120%", "180%"] }}
-          transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
-          style={{
-            position: "absolute", top: 0, left: 0, width: "40%", height: "100%",
-            background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.06), transparent)",
-            pointerEvents: "none",
-          }}
-        />
+        {/* Shimmer CSS */}
+        <div className="rsvp-shimmer" style={{ position: "absolute", top: 0, left: 0, width: "40%", height: "100%", background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.06), transparent)", pointerEvents: "none" }} />
         <div style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 1, background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.7), transparent)" }} />
 
-        <button onClick={onClose} style={{
-          position: "absolute", top: 14, right: 14,
-          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "50%", width: 32, height: 32,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          cursor: "pointer", color: "rgba(255,255,255,0.4)",
-        }}><X size={16} /></button>
+        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "50%", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "rgba(255,255,255,0.4)" }}>
+          <X size={16} />
+        </button>
 
-        <h3 style={{
-          fontFamily: "'Cinzel Decorative', serif",
-          fontSize: "clamp(0.85rem, 2vw, 1.1rem)",
-          color: "#d4af37",
-          textAlign: "center",
-          letterSpacing: "0.06em",
-          marginBottom: 20,
-        }}>Soutenir Maman</h3>
+        <h3 style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: "clamp(1rem, 2.5vw, 1.15rem)", color: "#d4af37", textAlign: "center", letterSpacing: "0.06em", marginBottom: 20 }}>
+          Soutenir Maman
+        </h3>
 
-        {/* Orange Money */}
-        <div style={{
-          background: "rgba(255,102,0,0.06)",
-          border: "1px solid rgba(255,102,0,0.25)",
-          borderRadius: 16,
-          padding: "clamp(1rem, 3vw, 1.4rem)",
-          marginBottom: 12,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}>
+        {/* Orange Money — affichage du numéro + copie */}
+        <div style={{ background: "rgba(255,102,0,0.06)", border: "1px solid rgba(255,102,0,0.25)", borderRadius: 16, padding: "clamp(1rem, 3vw, 1.4rem)", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{
-              width: 38, height: 38, borderRadius: "50%",
-              background: "rgba(255,102,0,0.12)",
-              border: "1px solid rgba(255,102,0,0.3)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
+            <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,102,0,0.12)", border: "1px solid rgba(255,102,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Smartphone size={17} style={{ color: "#FF6600" }} />
             </div>
             <div>
-              <p style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: "0.65rem", color: "white", letterSpacing: "0.04em" }}>Orange Money</p>
-              <p style={{ fontFamily: "monospace", fontSize: "0.85rem", color: "#FF6600", letterSpacing: "0.12em", marginTop: 2 }}>699 332 456</p>
+              <p style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: "clamp(0.9rem, 2vw, 0.95rem)", color: "white", letterSpacing: "0.04em" }}>Orange Money</p>
+              <p style={{ fontFamily: "monospace", fontSize: "clamp(1rem, 2.5vw, 1.05rem)", color: "#FF6600", letterSpacing: "0.12em", marginTop: 2 }}>699 332 456</p>
             </div>
           </div>
-          <button onClick={copy} style={{
-            background: copied ? "rgba(212,175,55,0.15)" : "rgba(255,102,0,0.1)",
-            border: `1px solid ${copied ? "rgba(212,175,55,0.4)" : "rgba(255,102,0,0.3)"}`,
-            borderRadius: 10, padding: "6px 10px", cursor: "pointer",
-            color: copied ? "#d4af37" : "#FF6600",
-            fontFamily: "sans-serif", fontSize: "0.55rem", letterSpacing: "0.2em",
-            display: "flex", alignItems: "center", gap: 4,
-          }}>
+          <button onClick={copy} style={{ background: copied ? "rgba(212,175,55,0.15)" : "rgba(255,102,0,0.1)", border: `1px solid ${copied ? "rgba(212,175,55,0.4)" : "rgba(255,102,0,0.3)"}`, borderRadius: 10, padding: "8px 12px", cursor: "pointer", color: copied ? "#d4af37" : "#FF6600", fontFamily: "sans-serif", fontSize: "clamp(0.88rem, 2vw, 0.9rem)", letterSpacing: "0.2em", display: "flex", alignItems: "center", gap: 4 }}>
             {copied ? <Check size={13} /> : <Copy size={13} />}
+            {copied ? "Copié" : "Copier"}
           </button>
         </div>
 
-        {/* Envelope option */}
+        {/* Enveloppe option */}
         <button
-          onClick={() => { onSelect("Enveloppe"); onClose(); }}
-          style={{
-            width: "100%", padding: "clamp(0.8rem, 2vw, 1rem)",
-            background: "rgba(212,175,55,0.04)",
-            border: "1px solid rgba(212,175,55,0.18)",
-            borderRadius: 14, cursor: "pointer", textAlign: "left",
-          }}
+          onClick={() => { onSelect("Enveloppe Physique"); onClose(); }}
+          style={{ width: "100%", padding: "clamp(0.9rem, 2.5vw, 1.1rem)", background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.18)", borderRadius: 14, cursor: "pointer", textAlign: "left" }}
         >
-          <p style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: "0.65rem", color: "white", letterSpacing: "0.04em" }}>Enveloppe Physique</p>
-          <p style={{ fontFamily: "sans-serif", fontSize: "0.5rem", color: "rgba(255,255,255,0.35)", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 3 }}>Le jour de la fête</p>
+          <p style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: "clamp(0.92rem, 2vw, 0.95rem)", color: "white", letterSpacing: "0.04em" }}>Enveloppe Physique</p>
+          <p style={{ fontFamily: "sans-serif", fontSize: "clamp(0.82rem, 1.8vw, 0.82rem)", color: "rgba(255,255,255,0.35)", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 4 }}>Le jour de la fête</p>
         </button>
 
+        {/* Confirmer Orange Money */}
         <button
           onClick={() => { onSelect("Orange Money"); onClose(); }}
-          style={{
-            marginTop: 14, width: "100%",
-            background: "linear-gradient(135deg, rgba(212,175,55,0.15), rgba(255,215,0,0.08))",
-            border: "1px solid rgba(212,175,55,0.3)",
-            borderRadius: 14, padding: "clamp(0.75rem, 2vw, 0.9rem)",
-            cursor: "pointer",
-            fontFamily: "'Cinzel Decorative', serif",
-            fontSize: "clamp(0.55rem, 1.4vw, 0.68rem)",
-            color: "#d4af37", letterSpacing: "0.15em",
-            textTransform: "uppercase",
-          }}
+          style={{ marginTop: 12, width: "100%", background: "linear-gradient(135deg, rgba(255,102,0,0.2), rgba(255,80,0,0.1))", border: "1px solid rgba(255,102,0,0.4)", borderRadius: 14, padding: "clamp(0.75rem, 2vw, 0.9rem)", cursor: "pointer", fontFamily: "'Cinzel Decorative', serif", fontSize: "clamp(0.88rem, 2vw, 0.88rem)", color: "#FF6600", letterSpacing: "0.12em", textTransform: "uppercase" }}
         >
-          Sélectionner Orange Money
+          ✓ Confirmer Orange Money
         </button>
       </motion.div>
     </div>
@@ -225,18 +163,12 @@ const PaymentModal = ({ onSelect, onClose }: {
 /* ── MAIN FORM ────────────────────────────────────────────────────── */
 const RSVPForm = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, amount: 0.15 });
+  const isInView = useInView(ref, { once: true, amount: 0.15 });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
 
-  const [form, setForm] = useState({
-    name: "",
-    attending: "",
-    message: "",
-    contribution: "",
-  });
-
+  const [form, setForm] = useState({ name: "", attending: "", message: "", contribution: "" });
   const set = (k: keyof typeof form, v: string) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -259,19 +191,9 @@ const RSVPForm = () => {
   return (
     <>
       <FontStyle />
-      <section ref={ref} id="rsvp" style={{
-        padding: "clamp(3rem, 8vw, 6rem) 0",
-        background: "#050505",
-        overflow: "hidden",
-        position: "relative",
-      }}>
+      <section ref={ref} id="rsvp" style={{ padding: "clamp(3rem, 8vw, 6rem) 0", background: "#050505", overflow: "hidden", position: "relative" }}>
         {/* Ambient glow */}
-        <div style={{
-          position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)",
-          width: "clamp(200px, 60vw, 600px)", height: "clamp(200px, 60vw, 600px)",
-          background: "radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 65%)",
-          borderRadius: "50%", filter: "blur(50px)", pointerEvents: "none",
-        }} />
+        <div style={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)", width: "clamp(200px, 60vw, 600px)", height: "clamp(200px, 60vw, 600px)", background: "radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 65%)", borderRadius: "50%", filter: "blur(50px)", pointerEvents: "none" }} />
 
         <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 clamp(1rem, 4vw, 2rem)", position: "relative", zIndex: 1 }}>
 
@@ -282,19 +204,8 @@ const RSVPForm = () => {
             transition={{ duration: 0.9 }}
             style={{ textAlign: "center", marginBottom: "clamp(2rem, 5vw, 3.5rem)" }}
           >
-            <p style={{ fontFamily: "sans-serif", fontSize: "clamp(0.5rem, 1.3vw, 0.65rem)", letterSpacing: "0.4em", textTransform: "uppercase", color: "rgba(212,175,55,0.55)", marginBottom: 10 }}>
-              Réservation
-            </p>
-            <h2 style={{
-              fontFamily: "'Cinzel Decorative', serif",
-              fontSize: "clamp(1.2rem, 3.5vw, 2rem)",
-              color: "transparent",
-              background: "linear-gradient(135deg, #bf953f, #fcf6ba, #b38728)",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              letterSpacing: "0.05em",
-            }}>
+            <p style={{ fontFamily: "sans-serif", fontSize: "clamp(0.88rem, 2vw, 0.85rem)", letterSpacing: "0.4em", textTransform: "uppercase", color: "rgba(212,175,55,0.55)", marginBottom: 10 }}>Réservation</p>
+            <h2 style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: "clamp(1.4rem, 3.5vw, 2rem)", color: "transparent", background: "linear-gradient(135deg, #bf953f, #fcf6ba, #b38728)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: "0.05em" }}>
               Serez-vous des nôtres ?
             </h2>
             <div style={{ height: 1, width: 50, background: "linear-gradient(90deg, transparent, #d4af37, transparent)", margin: "14px auto 0" }} />
@@ -305,107 +216,37 @@ const RSVPForm = () => {
             initial={{ opacity: 0, y: 30, scale: 0.97 }}
             animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.97 }}
             transition={{ duration: 0.9, delay: 0.15 }}
-            style={{
-              background: "linear-gradient(145deg, #151003, #0a0800, #131002)",
-              border: "1px solid rgba(212,175,55,0.2)",
-              borderRadius: 28,
-              padding: "clamp(1.8rem, 5vw, 3rem)",
-              position: "relative",
-              overflow: "hidden",
-            }}
+            style={{ background: "linear-gradient(145deg, #151003, #0a0800, #131002)", border: "1px solid rgba(212,175,55,0.2)", borderRadius: 28, padding: "clamp(1.8rem, 5vw, 3rem)", position: "relative", overflow: "hidden" }}
           >
-            {/* Ambient shimmer */}
-            <motion.div
-              animate={{ x: ["-100%", "200%"] }}
-              transition={{ repeat: Infinity, duration: 5, ease: "linear" }}
-              style={{
-                position: "absolute", top: 0, left: 0, width: "35%", height: "100%",
-                background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.04), transparent)",
-                pointerEvents: "none",
-              }}
-            />
+            <div className="rsvp-shimmer-slow" style={{ position: "absolute", top: 0, left: 0, width: "35%", height: "100%", background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.04), transparent)", pointerEvents: "none" }} />
             <div style={{ position: "absolute", top: 0, left: "18%", right: "18%", height: 1, background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.6), transparent)" }} />
 
-            {/* Corner marks */}
-            {[{ top: 12, left: 12, borderWidth: "1px 0 0 1px" }, { top: 12, right: 12, borderWidth: "1px 1px 0 0" },
-              { bottom: 12, left: 12, borderWidth: "0 0 1px 1px" }, { bottom: 12, right: 12, borderWidth: "0 1px 1px 0" }
-            ].map((pos, i) => (
+            {[{ top: 12, left: 12, borderWidth: "1px 0 0 1px" }, { top: 12, right: 12, borderWidth: "1px 1px 0 0" }, { bottom: 12, left: 12, borderWidth: "0 0 1px 1px" }, { bottom: 12, right: 12, borderWidth: "0 1px 1px 0" }].map((pos, i) => (
               <div key={i} style={{ position: "absolute", width: 14, height: 14, borderStyle: "solid", borderColor: "rgba(212,175,55,0.25)", borderWidth: pos.borderWidth, ...pos }} />
             ))}
 
             <AnimatePresence mode="wait">
               {submitted ? (
-                /* ── SUCCESS ── */
-                <motion.div
-                  key="success"
-                  initial={{ scale: 0.88, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  style={{ textAlign: "center", padding: "clamp(1.5rem, 4vw, 2.5rem) 0" }}
-                >
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 120, damping: 10 }}
-                    style={{
-                      width: 72, height: 72, borderRadius: "50%",
-                      background: "linear-gradient(135deg, rgba(212,175,55,0.2), rgba(255,215,0,0.1))",
-                      border: "1px solid rgba(212,175,55,0.4)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      margin: "0 auto 20px",
-                    }}
-                  >
+                <motion.div key="success" initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ textAlign: "center", padding: "clamp(1.5rem, 4vw, 2.5rem) 0" }}>
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 120, damping: 10 }}
+                    style={{ width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg, rgba(212,175,55,0.2), rgba(255,215,0,0.1))", border: "1px solid rgba(212,175,55,0.4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
                     <Check size={30} style={{ color: "#d4af37" }} />
                   </motion.div>
-
-                  <h3 style={{
-                    fontFamily: "'Cinzel Decorative', serif",
-                    fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)",
-                    color: "#f0d98a",
-                    letterSpacing: "0.06em",
-                    marginBottom: 10,
-                  }}>C'est enregistré !</h3>
-
-                  <p style={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontStyle: "italic",
-                    color: "rgba(255,255,255,0.45)",
-                    fontSize: "clamp(0.88rem, 2vw, 1.05rem)",
-                    marginBottom: 24,
-                  }}>
-                    {form.attending === "Oui"
-                      ? "Maman Sylvie a hâte de vous voir !"
-                      : "Maman Sylvie a bien reçu votre message."}
+                  <h3 style={{ fontFamily: "'Cinzel Decorative', serif", fontSize: "clamp(1.1rem, 3vw, 1.3rem)", color: "#f0d98a", letterSpacing: "0.06em", marginBottom: 10 }}>C'est enregistré !</h3>
+                  <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", color: "rgba(255,255,255,0.45)", fontSize: "clamp(1.05rem, 2.5vw, 1.1rem)", marginBottom: 24 }}>
+                    {form.attending === "Oui" ? "Maman Sylvie a hâte de vous voir !" : "Maman Sylvie a bien reçu votre message."}
                   </p>
-
-                  <button
-                    onClick={() => setSubmitted(false)}
-                    style={{
-                      background: "none", border: "none", cursor: "pointer",
-                      fontFamily: "sans-serif",
-                      fontSize: "clamp(0.5rem, 1.2vw, 0.6rem)",
-                      letterSpacing: "0.3em",
-                      textTransform: "uppercase",
-                      color: "rgba(212,175,55,0.4)",
-                      borderBottom: "1px solid rgba(212,175,55,0.2)",
-                      paddingBottom: 2,
-                    }}
-                  >
+                  <button onClick={() => setSubmitted(false)} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "sans-serif", fontSize: "clamp(0.82rem, 1.8vw, 0.78rem)", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(212,175,55,0.4)", borderBottom: "1px solid rgba(212,175,55,0.2)", paddingBottom: 2 }}>
                     Modifier ma réponse
                   </button>
                 </motion.div>
               ) : (
-                /* ── FORM ── */
                 <form key="form" onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 22, position: "relative", zIndex: 1 }}>
 
                   {/* Name */}
                   <div>
                     <FieldLabel>Votre nom complet</FieldLabel>
-                    <GoldInput
-                      placeholder="Ex: Famille Kamga"
-                      value={form.name}
-                      onChange={(v) => set("name", v)}
-                      required
-                    />
+                    <GoldInput placeholder="Ex: Famille Kamga" value={form.name} onChange={(v) => set("name", v)} required />
                   </div>
 
                   {/* Attending */}
@@ -414,29 +255,18 @@ const RSVPForm = () => {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                       {["Oui", "Non"].map((status) => (
                         <motion.button
-                          key={status}
-                          type="button"
+                          key={status} type="button"
                           onClick={() => set("attending", status)}
                           whileTap={{ scale: 0.96 }}
                           style={{
-                            padding: "clamp(0.8rem, 2vw, 1.1rem)",
-                            borderRadius: 16,
-                            border: `1px solid ${form.attending === status
-                              ? (status === "Oui" ? "rgba(212,175,55,0.7)" : "rgba(255,255,255,0.35)")
-                              : "rgba(255,255,255,0.08)"}`,
-                            background: form.attending === status
-                              ? (status === "Oui"
-                                ? "linear-gradient(135deg, rgba(212,175,55,0.2), rgba(255,215,0,0.1))"
-                                : "rgba(255,255,255,0.06)")
-                              : "rgba(255,255,255,0.02)",
+                            padding: "clamp(0.9rem, 2vw, 1.1rem)", borderRadius: 16,
+                            border: `1px solid ${form.attending === status ? (status === "Oui" ? "rgba(212,175,55,0.7)" : "rgba(255,255,255,0.35)") : "rgba(255,255,255,0.08)"}`,
+                            background: form.attending === status ? (status === "Oui" ? "linear-gradient(135deg, rgba(212,175,55,0.2), rgba(255,215,0,0.1))" : "rgba(255,255,255,0.06)") : "rgba(255,255,255,0.02)",
                             cursor: "pointer",
                             fontFamily: "'Cinzel Decorative', serif",
-                            fontSize: "clamp(0.55rem, 1.3vw, 0.68rem)",
-                            letterSpacing: "0.1em",
-                            textTransform: "uppercase",
-                            color: form.attending === status
-                              ? (status === "Oui" ? "#d4af37" : "rgba(255,255,255,0.7)")
-                              : "rgba(255,255,255,0.25)",
+                            fontSize: "clamp(0.88rem, 2vw, 0.88rem)",
+                            letterSpacing: "0.1em", textTransform: "uppercase",
+                            color: form.attending === status ? (status === "Oui" ? "#d4af37" : "rgba(255,255,255,0.7)") : "rgba(255,255,255,0.25)",
                             transition: "all 0.3s",
                           }}
                         >
@@ -448,37 +278,16 @@ const RSVPForm = () => {
 
                   <AnimatePresence mode="wait">
                     {form.attending === "Oui" && (
-                      <motion.div
-                        key="present"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        style={{ display: "flex", flexDirection: "column", gap: 20, overflow: "hidden" }}
-                      >
+                      <motion.div key="present" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} style={{ display: "flex", flexDirection: "column", gap: 20, overflow: "hidden" }}>
+
                         {/* Contribution */}
                         <div>
                           <FieldLabel>Cadeau / Contribution</FieldLabel>
                           <button
-                            type="button"
-                            onClick={() => setShowPayment(true)}
-                            style={{
-                              width: "100%",
-                              background: form.contribution ? "rgba(212,175,55,0.06)" : "rgba(212,175,55,0.03)",
-                              border: `1px solid ${form.contribution ? "rgba(212,175,55,0.4)" : "rgba(212,175,55,0.15)"}`,
-                              borderRadius: 16,
-                              padding: "clamp(0.85rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.4rem)",
-                              display: "flex", justifyContent: "space-between", alignItems: "center",
-                              cursor: "pointer", textAlign: "left",
-                              transition: "all 0.3s",
-                            }}
+                            type="button" onClick={() => setShowPayment(true)}
+                            style={{ width: "100%", background: form.contribution ? "rgba(212,175,55,0.06)" : "rgba(212,175,55,0.03)", border: `1px solid ${form.contribution ? "rgba(212,175,55,0.4)" : "rgba(212,175,55,0.15)"}`, borderRadius: 16, padding: "clamp(0.9rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.4rem)", display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer", textAlign: "left", transition: "all 0.3s" }}
                           >
-                            <span style={{
-                              fontFamily: "'Cormorant Garamond', serif",
-                              fontStyle: "italic",
-                              fontSize: "clamp(0.88rem, 2vw, 1rem)",
-                              color: form.contribution ? "#d4af37" : "rgba(255,255,255,0.2)",
-                              letterSpacing: "0.03em",
-                            }}>
+                            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", fontSize: "clamp(1.05rem, 2.5vw, 1.05rem)", color: form.contribution ? "#d4af37" : "rgba(255,255,255,0.2)", letterSpacing: "0.03em" }}>
                               {form.contribution || "Choisir une option…"}
                             </span>
                             <Wand2 size={15} style={{ color: "rgba(212,175,55,0.5)" }} />
@@ -488,51 +297,22 @@ const RSVPForm = () => {
                         {/* Message */}
                         <div>
                           <FieldLabel>Un mot doux pour ses 50 ans ?</FieldLabel>
-                          <GoldTextarea
-                            placeholder="Écrivez ici votre message d'amour…"
-                            value={form.message}
-                            onChange={(v) => set("message", v)}
-                            rows={3}
-                          />
+                          <GoldTextarea placeholder="Écrivez ici votre message d'amour…" value={form.message} onChange={(v) => set("message", v)} rows={3} />
                         </div>
                       </motion.div>
                     )}
 
                     {form.attending === "Non" && (
-                      <motion.div
-                        key="absent"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        style={{ display: "flex", flexDirection: "column", gap: 16, overflow: "hidden" }}
-                      >
-                        <div style={{
-                          padding: "clamp(0.8rem, 2vw, 1rem)",
-                          borderRadius: 16,
-                          background: "rgba(255,255,255,0.02)",
-                          border: "1px solid rgba(255,255,255,0.06)",
-                          textAlign: "center",
-                        }}>
+                      <motion.div key="absent" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} style={{ display: "flex", flexDirection: "column", gap: 16, overflow: "hidden" }}>
+                        <div style={{ padding: "clamp(0.9rem, 2vw, 1rem)", borderRadius: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", textAlign: "center" }}>
                           <Frown size={18} style={{ color: "rgba(255,255,255,0.25)", margin: "0 auto 8px" }} />
-                          <p style={{
-                            fontFamily: "'Cormorant Garamond', serif",
-                            fontStyle: "italic",
-                            fontSize: "clamp(0.78rem, 1.8vw, 0.92rem)",
-                            color: "rgba(255,255,255,0.3)",
-                            letterSpacing: "0.04em",
-                            lineHeight: 1.6,
-                          }}>
+                          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: "italic", fontSize: "clamp(1rem, 2.5vw, 1.05rem)", color: "rgba(255,255,255,0.3)", letterSpacing: "0.04em", lineHeight: 1.6 }}>
                             Maman Sylvie sera triste de ne pas vous voir, mais elle comprendra.
                           </p>
                         </div>
                         <div>
                           <FieldLabel>Raison / Petit mot</FieldLabel>
-                          <GoldTextarea
-                            placeholder="Un empêchement ? Laissez-lui un mot d'amour…"
-                            value={form.message}
-                            onChange={(v) => set("message", v)}
-                            rows={3}
-                          />
+                          <GoldTextarea placeholder="Un empêchement ? Laissez-lui un mot d'amour…" value={form.message} onChange={(v) => set("message", v)} rows={3} />
                         </div>
                       </motion.div>
                     )}
@@ -546,35 +326,23 @@ const RSVPForm = () => {
                     whileTap={{ scale: 0.97 }}
                     style={{
                       padding: "clamp(0.9rem, 2.5vw, 1.2rem)",
-                      background: !form.name || !form.attending
-                        ? "rgba(212,175,55,0.1)"
-                        : "linear-gradient(135deg, #b8920e, #f0c842, #d4af37, #f0c842, #b8920e)",
-                      backgroundSize: "300% 100%",
-                      borderRadius: 16,
+                      background: !form.name || !form.attending ? "rgba(212,175,55,0.1)" : "linear-gradient(135deg, #b8920e, #f0c842, #d4af37, #f0c842, #b8920e)",
+                      backgroundSize: "300% 100%", borderRadius: 16,
                       border: `1px solid ${!form.name || !form.attending ? "rgba(212,175,55,0.15)" : "transparent"}`,
                       cursor: !form.name || !form.attending ? "not-allowed" : "pointer",
                       fontFamily: "'Cinzel Decorative', serif",
-                      fontSize: "clamp(0.58rem, 1.4vw, 0.72rem)",
-                      letterSpacing: "0.18em",
-                      textTransform: "uppercase",
+                      fontSize: "clamp(0.92rem, 2vw, 0.92rem)",
+                      letterSpacing: "0.18em", textTransform: "uppercase",
                       color: !form.name || !form.attending ? "rgba(212,175,55,0.3)" : "#1a0f00",
-                      fontWeight: "bold",
-                      transition: "all 0.3s",
-                      marginTop: 4,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
+                      fontWeight: "bold", transition: "all 0.3s", marginTop: 4,
+                      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                     }}
                   >
                     {isSubmitting
                       ? <Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} />
                       : form.attending === "Non"
                         ? "Envoyer mon message"
-                        : <>
-                            <Heart size={14} fill="rgba(26,15,0,0.5)" />
-                            Confirmer ma présence
-                          </>
+                        : <><Heart size={14} fill="rgba(26,15,0,0.5)" />Confirmer ma présence</>
                     }
                   </motion.button>
 

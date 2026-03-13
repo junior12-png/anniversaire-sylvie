@@ -22,30 +22,19 @@ const useFonts = () => {
 const ShimmerBar = ({ width = 60 }: { width?: number | string }) => (
   <div style={{ position: "relative", height: 1, width, overflow: "hidden" }}>
     <div style={{ position: "absolute", inset: 0, backgroundColor: "rgba(212,175,55,0.2)" }} />
-    <motion.div
-      animate={{ x: ["-100%", "200%"] }}
-      transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-      style={{
-        position: "absolute", top: 0, left: 0, height: "100%", width: "50%",
-        background: "linear-gradient(90deg, transparent, rgba(255,215,0,0.85), transparent)",
-      }}
-    />
+    <div className="footer-shimmer" style={{ position: "absolute", top: 0, left: 0, height: "100%", width: "50%", background: "linear-gradient(90deg, transparent, rgba(255,215,0,0.85), transparent)" }} />
   </div>
 );
 
-/* ── FLOATING ORB ─────────────────────────────────────────────────── */
+/* ── FLOATING ORB — CSS ───────────────────────────────────────────── */
 const FloatingOrb = ({ x, y, size, delay }: { x: string; y: string; size: number; delay: number }) => (
-  <motion.div
-    animate={{ y: [0, -18, 0], opacity: [0.06, 0.18, 0.06] }}
-    transition={{ repeat: Infinity, duration: 5 + delay, delay, ease: "easeInOut" }}
+  <div
     style={{
-      position: "absolute",
-      left: x, top: y,
-      width: size, height: size,
+      position: "absolute", left: x, top: y, width: size, height: size,
       borderRadius: "50%",
-      background: "radial-gradient(circle, rgba(212,175,55,0.4), transparent)",
-      filter: "blur(20px)",
-      pointerEvents: "none",
+      background: "radial-gradient(circle, rgba(212,175,55,0.35), transparent)",
+      filter: "blur(20px)", pointerEvents: "none",
+      animation: `footerOrb ${8 + delay}s ${delay}s ease-in-out infinite`,
     }}
   />
 );
@@ -93,29 +82,17 @@ const InvitationFooter = () => {
           style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "clamp(0.5rem, 2vw, 1.5rem)", marginBottom: "clamp(2.5rem, 6vw, 5rem)" }}
         >
           <ShimmerBar width="clamp(30px, 10vw, 100px)" />
-          <motion.span
-            animate={{ rotate: [0, 360] }}
-            transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
-            style={{ fontSize: "clamp(0.7rem, 1.5vw, 1rem)", color: "#d4af37", opacity: 0.6 }}
-          >
-            ✦
-          </motion.span>
+          <span className="footer-star-ccw" style={{ fontSize: "clamp(0.7rem, 1.5vw, 1rem)", color: "#d4af37", opacity: 0.6 }}>✦</span>
           <span style={{
             fontFamily: "'Cinzel Decorative', serif",
-            fontSize: "clamp(0.42rem, 1.1vw, 0.58rem)",
+            fontSize: "clamp(0.72rem, 1.5vw, 0.68rem)",
             letterSpacing: "0.42em",
             textTransform: "uppercase",
             color: "rgba(212,175,55,0.45)",
           }}>
             50 Ans de Grâce
           </span>
-          <motion.span
-            animate={{ rotate: [0, -360] }}
-            transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
-            style={{ fontSize: "clamp(0.7rem, 1.5vw, 1rem)", color: "#d4af37", opacity: 0.6 }}
-          >
-            ✦
-          </motion.span>
+          <span className="footer-star-cw" style={{ fontSize: "clamp(0.7rem, 1.5vw, 1rem)", color: "#d4af37", opacity: 0.6, display: "inline-block" }}>✦</span>
           <ShimmerBar width="clamp(30px, 10vw, 100px)" />
         </motion.div>
 
@@ -128,7 +105,7 @@ const InvitationFooter = () => {
         >
           <p style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "clamp(0.5rem, 1.3vw, 0.65rem)",
+            fontSize: "clamp(0.78rem, 1.8vw, 0.75rem)",
             letterSpacing: "0.45em",
             textTransform: "uppercase",
             color: "rgba(212,175,55,0.45)",
@@ -146,22 +123,9 @@ const InvitationFooter = () => {
             marginBottom: "clamp(0.3rem, 1vw, 0.6rem)",
           }}>
             <span style={{ color: "rgba(255,255,255,0.85)" }}>Maman </span>
-            <motion.span
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{ repeat: Infinity, duration: 5, ease: "linear" }}
-              style={{
-                background: "linear-gradient(90deg, #bf953f, #fcf6ba, #d4af37, #fcf6ba, #bf953f)",
-                backgroundSize: "300% 100%",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                display: "inline",
-              }}
-            >
+            <span className="footer-name-gradient" style={{ background: "linear-gradient(90deg, #bf953f, #fcf6ba, #d4af37, #fcf6ba, #bf953f)", backgroundSize: "300% 100%", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline" }}>
               Sylvie Aimée
-            </motion.span>
+            </span>
           </h2>
 
           <motion.p
@@ -170,7 +134,7 @@ const InvitationFooter = () => {
             transition={{ delay: 0.5, duration: 0.8 }}
             style={{
               fontFamily: "'Cinzel Decorative', serif",
-              fontSize: "clamp(0.42rem, 1.1vw, 0.58rem)",
+              fontSize: "clamp(0.72rem, 1.5vw, 0.68rem)",
               letterSpacing: "0.38em",
               textTransform: "uppercase",
               color: "rgba(212,175,55,0.4)",
@@ -230,7 +194,7 @@ const InvitationFooter = () => {
           <ShimmerBar width="clamp(16px, 4vw, 40px)" />
           <span style={{
             fontFamily: "sans-serif",
-            fontSize: "clamp(0.48rem, 1.2vw, 0.65rem)",
+            fontSize: "clamp(0.78rem, 1.8vw, 0.75rem)",
             letterSpacing: "0.3em",
             textTransform: "uppercase",
             color: "rgba(212,175,55,0.45)",
@@ -252,7 +216,7 @@ const InvitationFooter = () => {
         >
           <p style={{
             fontFamily: "sans-serif",
-            fontSize: "clamp(0.42rem, 1vw, 0.55rem)",
+            fontSize: "clamp(0.72rem, 1.5vw, 0.65rem)",
             letterSpacing: "0.3em",
             textTransform: "uppercase",
             color: "rgba(255,255,255,0.15)",
@@ -262,7 +226,17 @@ const InvitationFooter = () => {
         </motion.div>
       </div>
 
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400;1,600&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400;1,600&display=swap');
+      @keyframes footerOrb { 0%, 100% { transform: translateY(0); opacity: 0.06; } 50% { transform: translateY(-18px); opacity: 0.18; } }
+      @keyframes footerShimmer { from { transform: translateX(-200%); } to { transform: translateX(400%); } }
+      .footer-shimmer { animation: footerShimmer 3.5s linear infinite; }
+      .footer-star-ccw { animation: footerRotCCW 10s linear infinite; display: inline-block; }
+      .footer-star-cw { animation: footerRotCW 10s linear infinite; display: inline-block; }
+      @keyframes footerRotCCW { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+      @keyframes footerRotCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      .footer-name-gradient { animation: footerNameGrad 6s linear infinite; }
+      @keyframes footerNameGrad { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+      `}</style>
     </footer>
   );
 };

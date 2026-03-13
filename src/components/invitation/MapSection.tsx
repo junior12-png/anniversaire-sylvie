@@ -10,11 +10,10 @@ import { MapPin, Star } from "lucide-react";
 
 const MapSection = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, amount: 0.2 });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   const details = [
     { label: "Lieu de la fête", value: "Ndogpassi III", highlight: true },
-    { label: "Repère",          value: "Entrée Lycée",  highlight: false },
     { label: "Ville",           value: "Douala",         highlight: false },
     { label: "Pays",            value: "Cameroun",       highlight: false },
   ];
@@ -43,7 +42,7 @@ const MapSection = () => {
           </div>
 
           <p style={{
-            fontFamily: "sans-serif", fontSize: "clamp(0.45rem, 1.3vw, 0.65rem)",
+            fontFamily: "sans-serif", fontSize: "clamp(0.75rem, 1.8vw, 0.75rem)",
             letterSpacing: "0.4em", textTransform: "uppercase",
             color: "rgba(212,175,55,0.55)", marginBottom: 10,
           }}>Localisation</p>
@@ -91,16 +90,8 @@ const MapSection = () => {
             }} />
           ))}
 
-          {/* Shimmer */}
-          <motion.div
-            animate={{ x: ["-120%", "180%"] }}
-            transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-            style={{
-              position: "absolute", top: 0, left: 0, width: "50%", height: "100%",
-              background: "linear-gradient(90deg, transparent, rgba(255,245,200,0.04), transparent)",
-              transform: "skewX(-12deg)", pointerEvents: "none",
-            }}
-          />
+          {/* Shimmer CSS */}
+          <div className="map-shimmer" style={{ position: "absolute", top: 0, left: 0, width: "50%", height: "100%", background: "linear-gradient(90deg, transparent, rgba(255,245,200,0.04), transparent)", transform: "skewX(-12deg)", pointerEvents: "none" }} />
 
           {/* Gold top bar */}
           <div style={{
@@ -108,14 +99,10 @@ const MapSection = () => {
             background: "linear-gradient(90deg, transparent, rgba(212,175,55,0.7), transparent)",
           }} />
 
-          {/* Star */}
-          <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
-            style={{ marginBottom: 20 }}
-          >
-            <Star size={20} style={{ color: "rgba(212,175,55,0.4)", margin: "0 auto" }} fill="rgba(212,175,55,0.1)" />
-          </motion.div>
+          {/* Star CSS */}
+          <div style={{ marginBottom: 20 }}>
+            <Star size={20} className="map-star-rotate" style={{ color: "rgba(212,175,55,0.4)", margin: "0 auto" }} fill="rgba(212,175,55,0.1)" />
+          </div>
 
           {/* Details list */}
           <div style={{ display: "flex", flexDirection: "column", gap: "clamp(1rem, 3vw, 1.8rem)", position: "relative", zIndex: 1 }}>
@@ -128,7 +115,7 @@ const MapSection = () => {
               >
                 <p style={{
                   fontFamily: "sans-serif",
-                  fontSize: "clamp(0.45rem, 1.2vw, 0.6rem)",
+                  fontSize: "clamp(0.75rem, 1.8vw, 0.72rem)",
                   letterSpacing: "0.35em",
                   textTransform: "uppercase",
                   color: "rgba(212,175,55,0.45)",
@@ -163,7 +150,7 @@ const MapSection = () => {
           style={{
             textAlign: "center",
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "clamp(0.8rem, 2vw, 1rem)",
+            fontSize: "clamp(0.95rem, 2.5vw, 1.05rem)",
             fontStyle: "italic",
             color: "rgba(255,255,255,0.25)",
             marginTop: "clamp(1.5rem, 3vw, 2.5rem)",
@@ -173,7 +160,12 @@ const MapSection = () => {
         </motion.p>
       </div>
 
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@1,400&display=swap');`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:ital,wght@1,400&display=swap');
+  .map-shimmer { animation: mapShimmer 5s linear infinite; }
+  @keyframes mapShimmer { from { transform: skewX(-12deg) translateX(-200%); } to { transform: skewX(-12deg) translateX(400%); } }
+  .map-star-rotate { animation: mapStarRot 14s linear infinite; display: block; }
+  @keyframes mapStarRot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  `}</style>
     </section>
   );
 };
