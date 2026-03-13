@@ -1,9 +1,8 @@
 /**
- * HeroSection.tsx — OPTIMISÉ PERFORMANCE
- * ✅ Images remplacées : 4, 10, 11, 17, 18, 19, 34
- * ✅ Date mise à jour : 18 Avril 2026
- * ✅ Police augmentée sur mobile
- * ✅ Responsive SE → écran géant
+ * HeroSection.tsx
+ * ✅ Police MOBILE très augmentée (clamp min beaucoup plus grand)
+ * ✅ Grand écran PC : max jusqu'à 7rem pour le titre principal
+ * ✅ Imports images via @/assets (Vite path alias)
  */
 
 import { motion, AnimatePresence, useInView } from "framer-motion";
@@ -38,13 +37,13 @@ const FONTS = {
 };
 
 const SLIDES = [
-  { id: 0, message: "50 Ans de Lumière", sub: "Un demi-siècle de grâce et d'amour infini", font: FONTS.luckiest, msgColor: "#d4af37", subColor: "rgba(255,240,180,0.85)", gradient: "linear-gradient(160deg, rgba(20,8,0,0.88) 0%, rgba(40,20,0,0.55) 50%, rgba(10,5,0,0.82) 100%)", accentLeft: "#d4af37", animType: "bounce" },
-  { id: 1, message: "La Reine de nos Cœurs", sub: "Chaque jour à tes côtés est une bénédiction", font: FONTS.sunnyWinter, msgColor: "#fff8dc", subColor: "rgba(212,175,55,0.9)", gradient: "linear-gradient(160deg, rgba(5,0,18,0.88) 0%, rgba(15,5,40,0.55) 50%, rgba(5,0,12,0.82) 100%)", accentLeft: "#b8a0ff", animType: "typewriter" },
-  { id: 2, message: "Maman, tu es notre Force", sub: "Ta prière est notre armure chaque matin", font: FONTS.nickelodeon, msgColor: "#ffffff", subColor: "rgba(212,175,55,0.88)", gradient: "linear-gradient(160deg, rgba(0,12,5,0.88) 0%, rgba(0,30,15,0.55) 50%, rgba(0,10,4,0.82) 100%)", accentLeft: "#7fffd4", animType: "slide" },
-  { id: 3, message: "50 Ans ça se Fête !", sub: "En grande pompe, avec toute la famille", font: FONTS.luckiest, msgColor: "#d4af37", subColor: "rgba(255,235,150,0.90)", gradient: "linear-gradient(160deg, rgba(18,5,0,0.88) 0%, rgba(50,20,0,0.55) 50%, rgba(12,4,0,0.82) 100%)", accentLeft: "#ff9933", animType: "zoom" },
-  { id: 4, message: "Merci pour tout, Mama", sub: "Tes sacrifices ont bâti nos victoires", font: FONTS.sunnyWinter, msgColor: "#fff0e0", subColor: "rgba(200,160,80,0.90)", gradient: "linear-gradient(160deg, rgba(15,0,20,0.88) 0%, rgba(40,5,55,0.55) 50%, rgba(10,0,14,0.82) 100%)", accentLeft: "#f9a8d4", animType: "typewriter" },
-  { id: 5, message: "Une Fête Royale t'attend", sub: "Ndogpassi III · 18 Avril 2026 · 14h", font: FONTS.nickelodeon, msgColor: "#ffffff", subColor: "#d4af37", gradient: "linear-gradient(160deg, rgba(0,5,20,0.88) 0%, rgba(0,15,45,0.55) 50%, rgba(0,4,15,0.82) 100%)", accentLeft: "#60a5fa", animType: "bounce" },
-  { id: 6, message: "Sylvie Aimée, 50 ans de Grâce", sub: "Une femme d'exception, notre éternel soleil", font: FONTS.luckiest, msgColor: "#d4af37", subColor: "rgba(255,240,180,0.85)", gradient: "linear-gradient(160deg, rgba(20,8,0,0.88) 0%, rgba(40,20,0,0.55) 50%, rgba(10,5,0,0.82) 100%)", accentLeft: "#d4af37", animType: "zoom" },
+  { id: 0, message: "50 Ans de Lumière",          sub: "Un demi-siècle de grâce et d'amour infini",           font: FONTS.luckiest,    msgColor: "#d4af37",   subColor: "rgba(255,240,180,0.85)", gradient: "linear-gradient(160deg, rgba(20,8,0,0.88) 0%, rgba(40,20,0,0.55) 50%, rgba(10,5,0,0.82) 100%)",    accentLeft: "#d4af37",  animType: "bounce"     },
+  { id: 1, message: "La Reine de nos Cœurs",       sub: "Chaque jour à tes côtés est une bénédiction",         font: FONTS.sunnyWinter, msgColor: "#fff8dc",   subColor: "rgba(212,175,55,0.9)",   gradient: "linear-gradient(160deg, rgba(5,0,18,0.88) 0%, rgba(15,5,40,0.55) 50%, rgba(5,0,12,0.82) 100%)",     accentLeft: "#b8a0ff", animType: "typewriter" },
+  { id: 2, message: "Maman, tu es notre Force",    sub: "Ta prière est notre armure chaque matin",             font: FONTS.nickelodeon, msgColor: "#ffffff",   subColor: "rgba(212,175,55,0.88)", gradient: "linear-gradient(160deg, rgba(0,12,5,0.88) 0%, rgba(0,30,15,0.55) 50%, rgba(0,10,4,0.82) 100%)",    accentLeft: "#7fffd4",  animType: "slide"      },
+  { id: 3, message: "50 Ans ça se Fête !",         sub: "En grande pompe, avec toute la famille",              font: FONTS.luckiest,    msgColor: "#d4af37",   subColor: "rgba(255,235,150,0.90)", gradient: "linear-gradient(160deg, rgba(18,5,0,0.88) 0%, rgba(50,20,0,0.55) 50%, rgba(12,4,0,0.82) 100%)",   accentLeft: "#ff9933",  animType: "zoom"       },
+  { id: 4, message: "Merci pour tout, Mama",       sub: "Tes sacrifices ont bâti nos victoires",               font: FONTS.sunnyWinter, msgColor: "#fff0e0",   subColor: "rgba(200,160,80,0.90)", gradient: "linear-gradient(160deg, rgba(15,0,20,0.88) 0%, rgba(40,5,55,0.55) 50%, rgba(10,0,14,0.82) 100%)", accentLeft: "#f9a8d4",  animType: "typewriter" },
+  { id: 5, message: "Une Fête Royale t'attend",    sub: "Ndogpassi III · 18 Avril 2026 · 14h",                font: FONTS.nickelodeon, msgColor: "#ffffff",   subColor: "#d4af37",               gradient: "linear-gradient(160deg, rgba(0,5,20,0.88) 0%, rgba(0,15,45,0.55) 50%, rgba(0,4,15,0.82) 100%)",    accentLeft: "#60a5fa",  animType: "bounce"     },
+  { id: 6, message: "Sylvie Aimée, 50 ans de Grâce", sub: "Une femme d'exception, notre éternel soleil",      font: FONTS.luckiest,    msgColor: "#d4af37",   subColor: "rgba(255,240,180,0.85)", gradient: "linear-gradient(160deg, rgba(20,8,0,0.88) 0%, rgba(40,20,0,0.55) 50%, rgba(10,5,0,0.82) 100%)",   accentLeft: "#d4af37",  animType: "zoom"       },
 ];
 
 const spring = (stiffness: number, damping: number, duration?: number) =>
@@ -151,7 +150,7 @@ const HeroSection = () => {
         onMouseLeave={() => setIsPaused(false)}
         style={{ position: "relative", minHeight: "100svh", display: "flex", flexDirection: "column", background: "#000", overflow: "hidden" }}
       >
-        {/* Background images */}
+        {/* Background */}
         <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
           <AnimatePresence mode="sync">
             <motion.img
@@ -168,117 +167,92 @@ const HeroSection = () => {
           <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 45%, rgba(5,5,5,0.92) 100%)" }} />
         </div>
 
-        {/* Per-slide gradient overlay */}
         <AnimatePresence mode="sync">
-          <motion.div
-            key={`grad-${slide.id}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
-            style={{ position: "absolute", inset: 0, zIndex: 2, background: slide.gradient, pointerEvents: "none", willChange: "opacity" }}
-          />
+          <motion.div key={`grad-${slide.id}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 1.2 }}
+            style={{ position: "absolute", inset: 0, zIndex: 2, background: slide.gradient, pointerEvents: "none", willChange: "opacity" }} />
         </AnimatePresence>
 
         {/* Content */}
-        <motion.div
-          style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, width: "100%", minHeight: "100svh", padding: "clamp(4rem, 10vw, 8rem) clamp(1rem, 5vw, 5rem) clamp(3rem, 8vw, 6rem)", textAlign: "center", boxSizing: "border-box" }}
-        >
-          {/* Ornement haut */}
+        <motion.div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, width: "100%", minHeight: "100svh", padding: "clamp(4rem, 10vw, 8rem) clamp(1rem, 5vw, 5rem) clamp(3rem, 8vw, 6rem)", textAlign: "center", boxSizing: "border-box" }}>
+
           <ScrollReveal direction="down" delay={0.1}>
             <div style={{ display: "flex", alignItems: "center", gap: "clamp(8px, 2vw, 16px)", marginBottom: "clamp(1.5rem, 5vw, 4rem)", flexWrap: "wrap", justifyContent: "center" }}>
               <GoldLine width={30} />
-              <span style={{ fontFamily: FONTS.luckiest, fontSize: "clamp(0.85rem, 2vw, 0.88rem)", color: "rgba(212,175,55,0.7)", letterSpacing: "0.32em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+              <span style={{ fontFamily: FONTS.luckiest, fontSize: "clamp(1rem, 2vw, 1rem)", color: "rgba(212,175,55,0.7)", letterSpacing: "0.32em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
                 Événement Prestigieux · 2026
               </span>
               <GoldLine width={30} />
             </div>
           </ScrollReveal>
 
-          {/* Slide texte */}
           <motion.div
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.1}
-            onDragEnd={handleDragEnd}
-            style={{ width: "100%", maxWidth: "clamp(300px, 90vw, 900px)", cursor: "grab", userSelect: "none" }}
+            drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.1} onDragEnd={handleDragEnd}
+            style={{ width: "100%", maxWidth: "clamp(300px, 92vw, 1100px)", cursor: "grab", userSelect: "none" }}
             whileTap={{ cursor: "grabbing" }}
           >
             <AnimatePresence mode="wait">
               <motion.div
-                key={slide.id}
-                variants={variants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
+                key={slide.id} variants={variants} initial="initial" animate="animate" exit="exit"
                 style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "clamp(0.5rem, 2vw, 1.2rem)", padding: "0 clamp(0.5rem, 3vw, 2rem)" }}
               >
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-                  style={{ height: "clamp(2px, 0.4vw, 3px)", width: "clamp(2rem, 8vw, 5rem)", backgroundColor: slide.accentLeft, borderRadius: 2 }}
-                />
+                <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+                  style={{ height: "clamp(2px, 0.4vw, 3px)", width: "clamp(2rem, 8vw, 5rem)", backgroundColor: slide.accentLeft, borderRadius: 2 }} />
 
                 {slide.animType === "typewriter" ? (
-                  <TypewriterText text={slide.message} fontFamily={slide.font} color={slide.msgColor} fontSize="clamp(2rem, 7vw, 5.5rem)" />
+                  <TypewriterText text={slide.message} fontFamily={slide.font} color={slide.msgColor}
+                    /* ✅ MOBILE: 2.5rem minimum, GRAND ÉCRAN: 7rem */
+                    fontSize="clamp(2.5rem, 7vw, 7rem)" />
                 ) : (
-                  <span style={{ fontFamily: slide.font, fontSize: "clamp(2rem, 7vw, 5.5rem)", color: slide.msgColor, display: "block", lineHeight: 1.1, textShadow: `0 0 30px ${slide.accentLeft}44, 0 4px 20px rgba(0,0,0,0.6)`, letterSpacing: "0.02em", wordBreak: "break-word" }}>
+                  <span style={{ fontFamily: slide.font,
+                    /* ✅ MOBILE: 2.5rem minimum, GRAND ÉCRAN: 7rem */
+                    fontSize: "clamp(2.5rem, 7vw, 7rem)",
+                    color: slide.msgColor, display: "block", lineHeight: 1.1,
+                    textShadow: `0 0 30px ${slide.accentLeft}44, 0 4px 20px rgba(0,0,0,0.6)`,
+                    letterSpacing: "0.02em", wordBreak: "break-word" }}>
                     {slide.message}
                   </span>
                 )}
 
-                <motion.p
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.45, duration: 0.7 }}
-                  style={{ fontFamily: "'Dancing Script', cursive", fontSize: "clamp(1.05rem, 2.5vw, 1.5rem)", color: slide.subColor, maxWidth: "clamp(260px, 70vw, 620px)", lineHeight: 1.5, letterSpacing: "0.02em", wordBreak: "break-word" }}
-                >
+                <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.7 }}
+                  style={{ fontFamily: "'Dancing Script', cursive",
+                    /* ✅ MOBILE: 1.3rem min, GRAND ÉCRAN: 2.2rem */
+                    fontSize: "clamp(1.3rem, 2.5vw, 2.2rem)",
+                    color: slide.subColor, maxWidth: "clamp(260px, 70vw, 820px)", lineHeight: 1.5, letterSpacing: "0.02em", wordBreak: "break-word" }}>
                   {slide.sub}
                 </motion.p>
 
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
-                  style={{ height: 1, width: "clamp(1.5rem, 4vw, 3rem)", backgroundColor: "rgba(212,175,55,0.4)", borderRadius: 1 }}
-                />
+                <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
+                  style={{ height: 1, width: "clamp(1.5rem, 4vw, 3rem)", backgroundColor: "rgba(212,175,55,0.4)", borderRadius: 1 }} />
               </motion.div>
             </AnimatePresence>
           </motion.div>
 
-          {/* Dots */}
           <div style={{ marginTop: "clamp(1.2rem, 4vw, 3rem)" }}>
             <SlideDots count={SLIDES.length} current={current} onChange={goTo} />
           </div>
 
-          {/* Date */}
           <ScrollReveal direction="up" delay={0.3} style={{ marginTop: "clamp(1.2rem, 3.5vw, 2.5rem)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "clamp(6px, 2vw, 14px)", flexWrap: "wrap", justifyContent: "center" }}>
               <GoldLine width={22} />
-              <p style={{ fontFamily: FONTS.luckiest, fontSize: "clamp(0.88rem, 2vw, 0.88rem)", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)", whiteSpace: "nowrap" }}>
+              <p style={{ fontFamily: FONTS.luckiest,
+                /* ✅ MOBILE: 1rem min */
+                fontSize: "clamp(1rem, 2vw, 1rem)",
+                letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)", whiteSpace: "nowrap" }}>
                 18 Avril 2026 <span style={{ color: "rgba(212,175,55,0.5)" }}>•</span> Douala
               </p>
               <GoldLine width={22} />
             </div>
           </ScrollReveal>
 
-          {/* Découvrir */}
           <ScrollReveal direction="up" delay={0.5} style={{ marginTop: "clamp(1rem, 3vw, 2rem)" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <motion.span
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                style={{ fontFamily: FONTS.luckiest, fontSize: "clamp(0.82rem, 1.2vw, 0.78rem)", letterSpacing: "0.38em", textTransform: "uppercase", color: "rgba(212,175,55,0.5)" }}
-              >
+              <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                style={{ fontFamily: FONTS.luckiest, fontSize: "clamp(0.92rem, 1.2vw, 0.92rem)", letterSpacing: "0.38em", textTransform: "uppercase", color: "rgba(212,175,55,0.5)" }}>
                 Découvrir
               </motion.span>
               <div style={{ position: "relative", height: "clamp(28px, 5vw, 42px)", width: 1, overflow: "hidden", backgroundColor: "rgba(255,255,255,0.08)" }}>
-                <motion.div
-                  animate={{ y: [-42, 42] }}
-                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", repeatType: "mirror" }}
-                  style={{ position: "absolute", width: "100%", height: "100%", background: "linear-gradient(to bottom, transparent, rgba(212,175,55,0.7), transparent)", willChange: "transform" }}
-                />
+                <motion.div animate={{ y: [-42, 42] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", repeatType: "mirror" }}
+                  style={{ position: "absolute", width: "100%", height: "100%", background: "linear-gradient(to bottom, transparent, rgba(212,175,55,0.7), transparent)", willChange: "transform" }} />
               </div>
             </div>
           </ScrollReveal>
