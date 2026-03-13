@@ -101,7 +101,7 @@ const GoldPlaqueCard = ({ icon, title, content, sub, note, index }: CardProps) =
 const details = [
   { icon: <MapPin size={22} />, title: "Lieu", content: "Ndogpassi III", sub: "· Douala ·", note: "L'excellence pour vous recevoir." },
   { icon: <Clock size={22} />, title: "Horaire", content: "14h00", sub: "Début des festivités", note: "Soyez des nôtres dès l'ouverture." },
-  { icon: <PartyPopper size={22} />, title: "Ambiance", content: "Gala & Danse", sub: "Dîner gastronomique", note: "Une nuit gravée dans les mémoires." },
+  { icon: <PartyPopper size={22} />, title: "Ambiance", content: "Gala & Danse", sub: "Dîner gastronomique", note: "Une journée gravée dans les mémoires." },
   { icon: <Shirt size={22} />, title: "Dress Code", content: "Royal & Chic", sub: "Or, Blanc, Rose", note: "L'élégance est de mise." },
 ];
 

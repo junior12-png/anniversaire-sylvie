@@ -199,7 +199,7 @@ const InvitationFooter = () => {
             textTransform: "uppercase",
             color: "rgba(212,175,55,0.45)",
           }}>
-            19 Avril 2026 · Ndogpassi III · Douala
+            18 Avril 2026 · Ndogpassi III · Douala
           </span>
           <ShimmerBar width="clamp(16px, 4vw, 40px)" />
         </motion.div>
